@@ -7,9 +7,11 @@ from constants import *
 
 Edge = tuple[pygame.Vector2, Callable[[float], pygame.Vector2]]
 
+
+
 class AsteroidField(pygame.sprite.Sprite):
     containers: pygame.sprite.Group
-
+    
     edges: list[Edge] = [
         (
             pygame.Vector2(1, 0),
@@ -36,7 +38,7 @@ class AsteroidField(pygame.sprite.Sprite):
     def __init__(self) -> None:
         pygame.sprite.Sprite.__init__(self, self.containers)
         self.spawn_timer = 0.0
-
+        self.offset = pygame.Vector2(0, 0)
     def spawn(
         self, radius: float, position: pygame.Vector2, velocity: pygame.Vector2
     ) -> None:
@@ -45,6 +47,7 @@ class AsteroidField(pygame.sprite.Sprite):
 
     def update(self, dt: float) -> None:
         self.spawn_timer += dt
+        R = random.random() + 1
         if self.spawn_timer > ASTEROID_SPAWN_RATE_SECONDS:
             self.spawn_timer = 0
 
@@ -53,6 +56,6 @@ class AsteroidField(pygame.sprite.Sprite):
             speed = random.randint(40, 100)
             velocity = edge[0] * speed
             velocity = velocity.rotate(random.randint(-30, 30))
-            position = edge[1](random.uniform(0, 1))
+            position = edge[1](random.uniform(0, 1)) * R - pygame.Vector2(SCREEN_WIDTH * (1 - 1/R), SCREEN_HEIGHT  * (1 - 1/R)) + self.offset
             kind = random.randint(1, ASTEROID_KINDS)
             self.spawn(ASTEROID_MIN_RADIUS * kind, position, velocity)
